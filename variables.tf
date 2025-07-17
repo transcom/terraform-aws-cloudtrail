@@ -103,3 +103,9 @@ variable "trail_name" {
   default     = "cloudtrail"
   type        = string
 }
+
+variable "vpc_endpoint" {
+  description = "The VPC endpoint ID for KMS related resources"
+  default     = ""
+  type        = string
+}
