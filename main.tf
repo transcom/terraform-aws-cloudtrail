@@ -16,6 +16,7 @@ locals {
 #
 # This section is used for allowing CloudTrail to send logs to CloudWatch.
 #
+#
 
 # This policy allows the CloudTrail service for any account to assume this role.
 data "aws_iam_policy_document" "cloudtrail_assume_role" {
@@ -25,7 +26,8 @@ data "aws_iam_policy_document" "cloudtrail_assume_role" {
 
     principals {
       type        = "Service"
-      identifiers = ["cloudtrail.amazonaws.com"]
+      identifiers = ["cloudtrail.amazonaws.com",
+         "vpc-flow-logs.amazonaws.com"]
     }
   }
 }
