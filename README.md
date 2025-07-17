@@ -73,6 +73,7 @@ previous invocations of the module prior to upgrading the version.
 | sns_topic_arn | ARN of the SNS topic for notification of log file delivery. | `string` | `""` | no |
 | tags | A mapping of tags to CloudTrail resources. | `map(string)` | `{}` | no |
 | trail_name | Name for the Cloudtrail | `string` | `"cloudtrail"` | no |
+| vpc\_endpoint | The VPC endpoint ID for KMS related resources | `string` | `""` | no |
 
 ## Outputs
 

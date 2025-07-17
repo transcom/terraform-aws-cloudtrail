@@ -227,20 +227,88 @@ data "aws_iam_policy_document" "cloudtrail_kms_policy_doc" {
     resources = ["*"]
   }
 
-  statement {
+ statement {
     sid    = "Allow Cloudtrail to decrypt and generate key for sns access"
     effect = "Allow"
 
     principals {
-      type        = "Service"
-      identifiers = ["cloudtrail.amazonaws.com"]
+      type = "Service"
+      identifiers = [
+        "sns.amazonaws.com"
+      ]
     }
 
     actions = [
-      "kms:Decrypt*",
+      "kms:ReEncrypt*",
       "kms:GenerateDataKey*",
+      "kms:Encrypt*",
+      "kms:Describe*",
+      "kms:Decrypt*",
     ]
     resources = ["*"]
+  }
+
+  statement {
+    sid    = "Allow Cloudtrail to decrypt and generate key for sqs"
+    effect = "Allow"
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "sqs.amazonaws.com",
+      ]
+    }
+
+    actions = [
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:Encrypt*",
+      "kms:Describe*",
+      "kms:Decrypt*",
+      ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "Allow Cloudtrail to decrypt and generate key for posting to sns"
+    effect = "Allow"
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "cloudtrail.amazonaws.com",
+      ]
+    }
+
+    actions = [
+       "kms:GenerateDataKey*",
+        "kms:Describe*",
+        "kms:Decrypt*",
+
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "allow vpc-endpoint"
+    effect = "Allow"
+    actions = [
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:Encrypt*",
+      "kms:Describe*",
+      "kms:Decrypt*",
+    ]
+    resources = ["*"]
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:sourceVpce"
+      values   = [var.vpc_endpoint]
+    }
   }
 }
 
