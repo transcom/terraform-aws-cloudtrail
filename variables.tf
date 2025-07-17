@@ -33,6 +33,12 @@ variable "cloudwatch_log_group_name" {
   type        = string
 }
 
+variable "vpc_flow_logs_log_group_name" {
+  description = "The name of the CloudWatch Log Group that receives CloudTrail events."
+  default     = "monitoring-vpc-flow-logs"
+  type        = string
+}
+
 variable "enabled" {
   description = "Enables logging for the trail. Defaults to true. Setting this to false will pause logging."
   default     = true
