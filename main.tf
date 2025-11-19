@@ -24,9 +24,9 @@ data "aws_iam_policy_document" "cloudtrail_assume_role" {
     actions = ["sts:AssumeRole"]
 
     principals {
-      type        = "Service"
+      type = "Service"
       identifiers = ["cloudtrail.amazonaws.com",
-         "vpc-flow-logs.amazonaws.com"]
+      "vpc-flow-logs.amazonaws.com"]
     }
   }
 }
@@ -57,8 +57,8 @@ data "aws_iam_policy_document" "cloudtrail_cloudwatch_logs" {
     ]
 
     resources = [
-    "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${var.cloudwatch_log_group_name}:*",
-    "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${var.vpc_flow_logs_log_group_name}:*"
+      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${var.cloudwatch_log_group_name}:*",
+      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${var.vpc_flow_logs_log_group_name}:*"
     ]
   }
 }
@@ -216,8 +216,11 @@ data "aws_iam_policy_document" "cloudtrail_kms_policy_doc" {
     effect = "Allow"
 
     principals {
-      type        = "Service"
-      identifiers = ["logs.${data.aws_region.current.name}.amazonaws.com"]
+      type = "Service"
+      identifiers = [
+        "logs.${data.aws_region.current.name}.amazonaws.com",
+        "config.amazonaws.com"
+      ]
     }
 
     actions = [
@@ -230,7 +233,7 @@ data "aws_iam_policy_document" "cloudtrail_kms_policy_doc" {
     resources = ["*"]
   }
 
- statement {
+  statement {
     sid    = "Allow Cloudtrail to decrypt and generate key for sns access"
     effect = "Allow"
 
@@ -268,7 +271,7 @@ data "aws_iam_policy_document" "cloudtrail_kms_policy_doc" {
       "kms:Encrypt*",
       "kms:Describe*",
       "kms:Decrypt*",
-      ]
+    ]
     resources = ["*"]
   }
 
@@ -284,9 +287,9 @@ data "aws_iam_policy_document" "cloudtrail_kms_policy_doc" {
     }
 
     actions = [
-       "kms:GenerateDataKey*",
-        "kms:Describe*",
-        "kms:Decrypt*",
+      "kms:GenerateDataKey*",
+      "kms:Describe*",
+      "kms:Decrypt*",
 
     ]
     resources = ["*"]
