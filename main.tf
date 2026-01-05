@@ -344,7 +344,8 @@ data "aws_iam_policy_document" "cloudtrail_kms_policy_doc" {
       principals {
         type = "AWS"
         identifiers = [
-          "arn:aws-us-gov:iam::015466132150:user/cssp-apicwl-user"
+          "arn:aws-us-gov:iam::015466132150:user/cssp-apicwl-user",
+          "arn:aws-us-gov:iam::015466132150:role/CSSP-Cross-AccountRole"
         ]
       }
       actions = [
