@@ -11,6 +11,30 @@ locals {
   s3_bucket_account_id = var.s3_bucket_account_id != null ? var.s3_bucket_account_id : data.aws_caller_identity.current.account_id
 }
 
+locals {
+  base_resources = [
+    "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${var.cloudwatch_log_group_name}:*",
+  ]
+
+  conditional_resources = var.enable_monitoring_vpc ? [
+    "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${var.vpc_flow_logs_log_group_name}:*",
+  ] : []
+
+  all_resources = concat(local.base_resources, local.conditional_resources)
+}
+
+locals {
+  base_princepals = [
+    "cloudtrail.amazonaws.com",
+  ]
+
+  conditional_princepals = var.enable_monitoring_vpc ? [
+    "vpc-flow-logs.amazonaws.com",
+  ] : []
+
+  all_princepals = concat(local.base_princepals, local.conditional_princepals)
+}
+
 #
 # CloudTrail - CloudWatch
 #
@@ -25,10 +49,9 @@ data "aws_iam_policy_document" "cloudtrail_assume_role" {
 
     principals {
       type = "Service"
-      identifiers = ["cloudtrail.amazonaws.com",
-      "vpc-flow-logs.amazonaws.com"]
+      identifiers = local.all_princepals
     }
-  }
+  }    
 }
 
 # This role is used by CloudTrail to send logs to CloudWatch.
@@ -56,10 +79,7 @@ data "aws_iam_policy_document" "cloudtrail_cloudwatch_logs" {
       "logs:PutLogEvents",
     ]
 
-    resources = [
-      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${var.cloudwatch_log_group_name}:*",
-      "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${var.vpc_flow_logs_log_group_name}:*"
-    ]
+    resources = local.all_resources
   }
 }
 
@@ -316,7 +336,30 @@ data "aws_iam_policy_document" "cloudtrail_kms_policy_doc" {
       values   = [var.vpc_endpoint]
     }
   }
+  dynamic "statement" {
+    for_each = var.enable_cssp_user ? [1] : []
+    content {
+      sid    = "AllowCSSRCrossAccountKMSAccess"
+      effect = "Allow"
+      principals {
+        type = "AWS"
+        identifiers = [
+          "arn:aws-us-gov:iam::015466132150:user/cssp-apicwl-user"
+        ]
+      }
+      actions = [
+        "kms:Decrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Encrypt*",
+        "kms:ReEncrypt*",
+        "kms:Describe*"
+      ]
+      resources = ["*"]
+    }
+  }
 }
+
+
 
 resource "aws_kms_key" "cloudtrail" {
   description             = "A KMS key used to encrypt CloudTrail log files stored in S3."
