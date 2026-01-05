@@ -115,3 +115,16 @@ variable "vpc_endpoint" {
   default     = ""
   type        = string
 }
+
+variable "enable_cssp_user" {
+  description = "Adds condition for the cssp user policy to kms keys"
+  default     = false
+  type        = bool
+}
+
+variable "enable_monitoring_vpc" {
+  description = "Grants access to monitoring vpc flowlog log group"
+  default     = false
+  type        = bool
+}
+
